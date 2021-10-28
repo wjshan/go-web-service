@@ -1,15 +1,24 @@
 package units
 
-import log "github.com/sirupsen/logrus"
+import (
+	log "github.com/sirupsen/logrus"
+)
 
-var LogMap map[string]*log.Logger
+var LogInstance *logMaker = &logMaker{}
 
-func GetLog(name string) *log.Logger {
-	if logger, ok := LogMap[name]; ok {
+type logMaker struct {
+	logMap map[string]*log.Logger
+}
+
+func (m *logMaker) GetLog(name string) *log.Logger {
+	if m.logMap == nil {
+		m.logMap = make(map[string]*log.Logger)
+	}
+	if logger, ok := m.logMap[name]; ok {
 		return logger
 	}
 	logger := log.New()
-	LogMap[name] = logger
+	m.logMap[name] = logger
 	log.SetFormatter(&log.JSONFormatter{})
 	return logger
 }
